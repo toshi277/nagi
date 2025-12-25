@@ -41,7 +41,7 @@ OS：Linux（CentOS）
 
 JSライブラリ：jQuery
 
-IDE：Cloud9
+IDE：Visual Studio Code
 
 # 使用素材
 

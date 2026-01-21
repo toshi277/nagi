@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>nagi</title>
+    <title>Nagi</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -12,9 +12,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
     <script src="https://kit.fontawesome.com/814ee3b13b.js" crossorigin="anonymous"></script>
-  
-  
-    </head>
+  </head>
 
   <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -23,32 +21,114 @@
 
         <div class="collapse navbar-collapse">
           <ul class="navbar-nav ml-auto">
-          <li class="nav-item">
-          <%= link_to root_path, class: "nav-link", style: "color: white;" do %>
-          <i class="fa-solid fa-home" style="color: white;"></i> Home
-          <% end %>
-          </li>
+            <li class="nav-item">
+              <%= link_to root_path, class: "nav-link text-white" do %>
+                <i class="fas fa-home"></i> Home
+              <% end %>
+            </li>
 
-          <li class="nav-item">
-          <%= link_to about_path, class: "nav-link", style: "color: white;" do %>                                              
-          <i class="fa-solid fa-link" style="color: white;"></i> About
-          <% end %>
-          </li>
+            <li class="nav-item">
+              <%= link_to mypage_path, class: "nav-link", style: "color: white;" do %>
+                <i class="fa-solid fa-users" style="color: white;"></i> Users
+              <% end %>
+            </li>
 
-          <li class="nav-item">
-          <%= link_to new_user_registration_path, class: "nav-link", style: "color: white;" do %>
-          <i class="fa-solid fa-user-plus" style="color: white;"></i> Sign up
-          <% end %>
-          </li>
-          
-          <li class="nav-item">
-          <%= link_to new_user_session_path, class: "nav-link", style: "color: white;" do %>
-          <i class="fa-solid fa-sign-in-alt" style="color: white;"></i> Log in
-          <% end %>
-        </li>
+            <li class="nav-item">
+              <%= link_to posts_path, class: "nav-link", style: "color: white;" do %>
+                <i class="fa-solid fa-book-open" style="color: white;"></i> posts
+              <% end %>
+            </li>
+
+            <li class="nav-item">
+              <%= link_to about_path, class: "nav-link text-white" do %>
+                <i class="fas fa-link"></i> About
+              <% end %>
+            </li>
+
+            <!-- ユーザー用 -->
+            <% if user_signed_in? %>
+              <li class="nav-item">
+                <%= link_to destroy_user_session_path, method: :delete, class: "nav-link text-white" do %>
+                  <i class="fas fa-sign-out-alt"></i> Log out
+                <% end %>
+              </li>
+            <% else %>
+              <li class="nav-item">
+                <%= link_to new_user_registration_path, class: "nav-link text-white" do %>
+                  <i class="fas fa-user-plus"></i> Sign up
+                <% end %>
+              </li>
+
+              <li class="nav-item">
+                <%= link_to new_user_session_path, class: "nav-link text-white" do %>
+                  <i class="fas fa-sign-in-alt"></i> Log in
+                <% end %>
+              </li>
+            <% end %>
+
+            <!-- 管理者用 -->
+            <% if admin_signed_in? %>
+              <li class="nav-item">
+                <%= link_to destroy_admin_session_path,
+                            method: :delete,
+                            class: "nav-link",
+                            style: "color: #ffc107;" do %>
+                  <i class="fas fa-user-shield"></i> Admin Log out
+                <% end %>
+              </li>
+            <% else %>
+              <li class="nav-item">
+                <%= link_to new_admin_session_path,
+                            class: "nav-link",
+                            style: "color: #ffc107;" do %>
+                  <i class="fas fa-user-shield"></i> Admin Log in
+                <% end %>
+              </li>
+            <% end %>
+
+          </ul>
         </div>
       </div>
     </nav>
+
+    <% if user_signed_in? && ["users", "posts"].include?(controller_name) %>
+      <div class="bg-light border-bottom py-2">
+        <div class="container d-flex justify-content-center">
+
+          <%= form_with url: search_path,
+                method: :get,
+                local: true,
+                class: "form-inline" do |f| %>
+
+            <!-- 検索ワード -->
+            <%= f.text_field :word,
+                  value: params[:word],
+                  placeholder: "Search...",
+                  class: "form-control form-control-sm mr-2",
+                  style: "width: 180px;" %>
+
+            <!-- 検索対象 -->
+            <%= f.select :range,
+                  options_for_select([["User","User"], ["Post","Post"]], params[:range]),
+                  {}, class: "custom-select custom-select-sm mr-2 w-auto" %>
+
+            <!-- 検索手法 -->
+            <%= f.select :search,
+                  options_for_select(
+                    [
+                      ["完全一致","perfect_match"],
+                      ["部分一致","partial_match"]
+                    ],
+                    params[:search]
+                  ),
+                  {}, class: "custom-select custom-select-sm mr-2 w-auto" %>
+
+            <%= f.submit "検索", class: "btn btn-sm btn-outline-secondary" %>
+
+          <% end %>
+        </div>
+      </div>
+    <% end %>
 
     <div class="container mt-3">
       <% if notice %>
@@ -59,7 +139,9 @@
       <% end %>
     </div>
 
-    <%= yield %>
+    <main class="container mt-3">
+      <%= yield %>
+    </main>
   </body>
 </html>
 

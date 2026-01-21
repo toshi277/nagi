@@ -3,5 +3,6 @@ class HomesController < ApplicationController
   def about; end
   def sign_in; end
   def sign_up; end
+  def search; end
 end
 

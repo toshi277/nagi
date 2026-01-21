@@ -1,0 +1,16 @@
+<h2>ユーザー詳細</h2>
+
+<p>ID：<%= @user.id %></p>
+<p>名前：<%= @user.name %></p>
+<p>メール：<%= @user.email %></p>
+<p>状態：<%= @user.is_deleted ? "退会" : "有効" %></p>
+
+<% unless @user.is_deleted %>
+  <%= link_to "退会させる",
+              withdraw_admin_user_path(@user),
+              method: :patch,
+              data: { confirm: "本当に退会処理を行いますか？" },
+              class: "btn btn-danger" %>
+<% else %>
+  <p class="text-muted">このユーザーは退会済みです。</p>
+<% end %>

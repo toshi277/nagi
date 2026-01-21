@@ -1,0 +1,25 @@
+<h2>ユーザー一覧</h2>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>名前</th>
+      <th>メール</th>
+      <th>状態</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @users.each do |user| %>
+      <tr>
+        <td><%= user.id %></td>
+        <td><%= user.name %></td>
+        <td><%= user.email %></td>
+        <td><%= user.is_deleted ? "退会" : "有効" %></td>
+        <td><%= link_to "詳細", admin_user_path(user), class: "btn btn-sm btn-outline-dark" %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+

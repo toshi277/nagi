@@ -1,12 +1,75 @@
-<h1>投稿一覧</h1>
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-10 mx-auto">
 
-<ul>
-  <% @posts.each do |post| %>
-    <li>
-      <%= link_to post.title, post_path(post) %>
-    </li>
-  <% end %>
-</ul>
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Posts</h2>
+        <%= link_to "New Post", new_post_path, class: "btn btn-primary" %>
+      </div>
 
-<%= link_to "新規投稿", new_post_path %>
+      <table class="table table-hover">
+        <thead class="thead-light">
+          <tr>
+            <th>Title</th>
+            <th>Comment</th>
+            <th class="text-center">Likes</th>
+            <th></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <% @posts.each do |post| %>
+            <tr>
+              <!-- タイトル -->
+              <td>
+                <%= link_to post.title,
+                            post_path(post),
+                            class: "text-dark font-weight-bold" %>
+              </td>
+
+              <!-- 本文 -->
+              <td>
+                <%= truncate(post.body, length: 50) %>
+              </td>
+
+              <!-- いいね -->
+              <td class="text-center">
+                <% if user_signed_in? %>
+                  <% if post.favorited_by?(current_user) %>
+                    <%= link_to post_favorite_path(post),
+                                method: :delete,
+                                class: "text-danger",
+                                data: { confirm: "いいねを外しますか？" } do %>
+                      <i class="fas fa-heart"></i>
+                      <%= post.favorites.count %>
+                    <% end %>
+                  <% else %>
+                    <%= link_to post_favorite_path(post),
+                                method: :post,
+                                class: "text-secondary" do %>
+                      <i class="far fa-heart"></i>
+                      <%= post.favorites.count %>
+                    <% end %>
+                  <% end %>
+                <% else %>
+                  <i class="far fa-heart"></i>
+                  <%= post.favorites.count %>
+                <% end %>
+              </td>
+
+              <!-- 詳細 -->
+              <td class="text-right">
+                <%= link_to "Show",
+                            post_path(post),
+                            class: "btn btn-sm btn-outline-secondary" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+</div>
+
 

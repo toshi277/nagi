@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Nagi</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag "application", media: "all", "data-turbolinks-track": "reload" %>
+    <%= javascript_pack_tag "application", "data-turbolinks-track": "reload" %>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+    <script src="https://kit.fontawesome.com/814ee3b13b.js" crossorigin="anonymous"></script>
+  </head>
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container">
+        <%= link_to "Nagi", root_path, class: "navbar-brand" %>
+
+        <div class="collapse navbar-collapse">
+          <ul class="navbar-nav ml-auto">
+            <!-- 管理者用 -->
+            <% if admin_signed_in? %>
+              <li class="nav-item">
+                <%= link_to destroy_admin_session_path,
+                            method: :delete,
+                            class: "nav-link",
+                            style: "color: #ffc107;" do %>
+                  <i class="fas fa-user-shield"></i> Admin Log out
+                <% end %>
+              </li>
+            <% else %>
+              <li class="nav-item">
+                <%= link_to new_admin_session_path,
+                            class: "nav-link",
+                            style: "color: #ffc107;" do %>
+                  <i class="fas fa-user-shield"></i> Admin Log in
+                <% end %>
+              </li>
+            <% end %>
+
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    
+    <div class="container mt-3">
+      <% if notice %>
+        <div class="alert alert-info"><%= notice %></div>
+      <% end %>
+      <% if alert %>
+        <div class="alert alert-danger"><%= alert %></div>
+      <% end %>
+    </div>
+
+    <main class="container mt-3">
+      <%= yield %>
+    </main>
+  </body>
+</html>
+
+
+
+

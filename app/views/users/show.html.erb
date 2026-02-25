@@ -3,6 +3,7 @@
     <div class="col-md-3">
       <h2>User info</h2>
       <%= image_tag "no_image.jpg", size: "120x120", class: "rounded-circle" %>
+
       <table class="table">
         <tbody>
           <tr>
@@ -28,27 +29,56 @@
 
       <%= form_with model: @post, url: posts_path, local: true do |f| %>
         <div class="form-group">
-          <label>Title</label>
+          <%= f.label :title, "Title" %>
           <%= f.text_field :title, class: "form-control" %>
         </div>
 
         <div class="form-group">
-          <label>Comment</label>
+          <%= f.label :body, "Comment" %>
           <%= f.text_area :body, class: "form-control" %>
         </div>
 
-        <%= f.submit "Create Post", class: "btn btn-success" %>
+        <!-- ★ 5段階評価（投稿時） -->
+        <div class="form-group">
+          <%= f.label :rate, "Rate" %>
+          <div id="post_raty"></div>
+          <%= f.hidden_field :rate, id: "rate_field" %>
+        </div>
+
+        <%= f.submit "Create Post", class: "btn btn-success btn-block" %>
       <% end %>
+
+      <!-- 投稿フォーム用 raty -->
+      <script>
+      (() => {
+        const elem = document.querySelector("#post_raty");
+        if (!elem) return;
+        if (elem.dataset.ratyInitialized) return;
+
+        raty(elem, {
+          starOn: "<%= asset_path('star-on.png') %>",
+          starOff: "<%= asset_path('star-off.png') %>",
+          starHalf: "<%= asset_path('star-half.png') %>",
+          scoreName: "post[rate]",
+          click: function(score) {
+            document.getElementById("rate_field").value = score;
+          }
+        });
+
+        elem.dataset.ratyInitialized = "true";
+      })();
+      </script>
     </div>
 
     <div class="col-md-8 offset-md-1">
-      <h2>Posts</h2>
+      <h2>MY Posts</h2>
 
       <table class="table">
         <thead>
           <tr>
             <th>Title</th>
-            <th>Body</th>
+            <th>Comment</th>
+            <th>Rate</th>
           </tr>
         </thead>
         <tbody>
@@ -56,13 +86,36 @@
             <tr>
               <td><%= link_to post.title, post_path(post) %></td>
               <td><%= post.body %></td>
+              <td>
+                <div class="post-rate" data-score="<%= post.rate || 0 %>"></div>
+              </td>
             </tr>
           <% end %>
         </tbody>
       </table>
+
+      <!-- 一覧表示用 raty（readOnly） -->
+      <script>
+      (() => {
+        document.querySelectorAll(".post-rate").forEach((elem) => {
+          if (elem.dataset.ratyInitialized) return;
+
+          raty(elem, {
+            starOn: "<%= asset_path('star-on.png') %>",
+            starOff: "<%= asset_path('star-off.png') %>",
+            starHalf: "<%= asset_path('star-half.png') %>",
+            readOnly: true,
+            score: elem.dataset.score
+          });
+
+          elem.dataset.ratyInitialized = "true";
+        });
+      })();
+      </script>
     </div>
   </div>
 </div>
+
 
 
 

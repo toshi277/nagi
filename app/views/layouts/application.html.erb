@@ -21,53 +21,9 @@
 
         <div class="collapse navbar-collapse">
           <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-              <%= link_to root_path, class: "nav-link text-white" do %>
-                <i class="fas fa-home"></i> Home
-              <% end %>
-            </li>
 
-            <li class="nav-item">
-              <%= link_to mypage_path, class: "nav-link", style: "color: white;" do %>
-                <i class="fa-solid fa-users" style="color: white;"></i> Users
-              <% end %>
-            </li>
-
-            <li class="nav-item">
-              <%= link_to posts_path, class: "nav-link", style: "color: white;" do %>
-                <i class="fa-solid fa-book-open" style="color: white;"></i> posts
-              <% end %>
-            </li>
-
-            <li class="nav-item">
-              <%= link_to about_path, class: "nav-link text-white" do %>
-                <i class="fas fa-link"></i> About
-              <% end %>
-            </li>
-
-            <!-- ユーザー用 -->
-            <% if user_signed_in? %>
-              <li class="nav-item">
-                <%= link_to destroy_user_session_path, method: :delete, class: "nav-link text-white" do %>
-                  <i class="fas fa-sign-out-alt"></i> Log out
-                <% end %>
-              </li>
-            <% else %>
-              <li class="nav-item">
-                <%= link_to new_user_registration_path, class: "nav-link text-white" do %>
-                  <i class="fas fa-user-plus"></i> Sign up
-                <% end %>
-              </li>
-
-              <li class="nav-item">
-                <%= link_to new_user_session_path, class: "nav-link text-white" do %>
-                  <i class="fas fa-sign-in-alt"></i> Log in
-                <% end %>
-              </li>
-            <% end %>
-
-            <!-- 管理者用 -->
             <% if admin_signed_in? %>
+              <!-- 管理者ログイン中 -->
               <li class="nav-item">
                 <%= link_to destroy_admin_session_path,
                             method: :delete,
@@ -76,7 +32,67 @@
                   <i class="fas fa-user-shield"></i> Admin Log out
                 <% end %>
               </li>
+
+            <% elsif user_signed_in? %>
+              <!-- ユーザーログイン中 -->
+              <li class="nav-item">
+                <%= link_to root_path, class: "nav-link text-white" do %>
+                  <i class="fas fa-home"></i> Home
+                <% end %>
+              </li>
+
+              <li class="nav-item">
+                <%= link_to mypage_path, class: "nav-link text-white" do %>
+                  <i class="fa-solid fa-users"></i> Users
+                <% end %>
+              </li>
+
+              <li class="nav-item">
+                <%= link_to posts_path, class: "nav-link text-white" do %>
+                  <i class="fa-solid fa-book-open"></i> Posts
+                <% end %>
+              </li>
+
+              <li class="nav-item">
+                <%= link_to about_path, class: "nav-link text-white" do %>
+                  <i class="fas fa-link"></i> About
+                <% end %>
+              </li>
+
+              <li class="nav-item">
+                <%= link_to destroy_user_session_path,
+                            method: :delete,
+                            class: "nav-link text-white" do %>
+                  <i class="fas fa-sign-out-alt"></i> Log out
+                <% end %>
+              </li>
+
             <% else %>
+              <!-- 未ログイン -->
+              <li class="nav-item">
+                <%= link_to root_path, class: "nav-link text-white" do %>
+                  <i class="fas fa-home"></i> Home
+                <% end %>
+              </li>
+
+              <li class="nav-item">
+                <%= link_to about_path, class: "nav-link text-white" do %>
+                  <i class="fas fa-link"></i> About
+                <% end %>
+              </li>
+
+              <li class="nav-item">
+                <%= link_to new_user_session_path, class: "nav-link text-white" do %>
+                  <i class="fas fa-sign-in-alt"></i> Log in
+                <% end %>
+              </li>
+
+              <li class="nav-item">
+                <%= link_to new_user_registration_path, class: "nav-link text-white" do %>
+                  <i class="fas fa-user-plus"></i> Sign up
+                <% end %>
+              </li>
+
               <li class="nav-item">
                 <%= link_to new_admin_session_path,
                             class: "nav-link",
@@ -94,49 +110,27 @@
     <% if user_signed_in? && ["users", "posts"].include?(controller_name) %>
       <div class="bg-light border-bottom py-2">
         <div class="container d-flex justify-content-center">
+          <%= form_with url: search_path, method: :get, local: true, class: "form-inline" do |f| %>
+            <%= f.text_field :word, value: params[:word], placeholder: "Search...",
+                  class: "form-control form-control-sm mr-2", style: "width: 180px;" %>
 
-          <%= form_with url: search_path,
-                method: :get,
-                local: true,
-                class: "form-inline" do |f| %>
-
-            <!-- 検索ワード -->
-            <%= f.text_field :word,
-                  value: params[:word],
-                  placeholder: "Search...",
-                  class: "form-control form-control-sm mr-2",
-                  style: "width: 180px;" %>
-
-            <!-- 検索対象 -->
             <%= f.select :range,
                   options_for_select([["User","User"], ["Post","Post"]], params[:range]),
                   {}, class: "custom-select custom-select-sm mr-2 w-auto" %>
 
-            <!-- 検索手法 -->
             <%= f.select :search,
-                  options_for_select(
-                    [
-                      ["完全一致","perfect_match"],
-                      ["部分一致","partial_match"]
-                    ],
-                    params[:search]
-                  ),
+                  options_for_select([["完全一致","perfect_match"], ["部分一致","partial_match"]], params[:search]),
                   {}, class: "custom-select custom-select-sm mr-2 w-auto" %>
 
             <%= f.submit "検索", class: "btn btn-sm btn-outline-secondary" %>
-
           <% end %>
         </div>
       </div>
     <% end %>
 
     <div class="container mt-3">
-      <% if notice %>
-        <div class="alert alert-info"><%= notice %></div>
-      <% end %>
-      <% if alert %>
-        <div class="alert alert-danger"><%= alert %></div>
-      <% end %>
+      <% if notice %><div class="alert alert-info"><%= notice %></div><% end %>
+      <% if alert %><div class="alert alert-danger"><%= alert %></div><% end %>
     </div>
 
     <main class="container mt-3">

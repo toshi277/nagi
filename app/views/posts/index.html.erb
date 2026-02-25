@@ -1,18 +1,106 @@
 <div class="container mt-4">
   <div class="row">
-    <div class="col-md-10 mx-auto">
 
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>Posts</h2>
-        <%= link_to "New Post", new_post_path, class: "btn btn-primary" %>
+    <!-- 左：User info + New post -->
+    <div class="col-md-3">
+
+      <h2>User info</h2>
+      <%= image_tag "no_image.jpg", size: "120x120", class: "rounded-circle" %>
+
+      <table class="table">
+        <tbody>
+          <tr>
+            <th>name</th>
+            <td><%= current_user.name %></td>
+          </tr>
+          <tr>
+            <th>introduction</th>
+            <td><%= current_user.introduction %></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="row mb-3">
+        <div class="col-md-12 text-center">
+          <%= link_to edit_user_path(current_user), class: "btn btn-outline-secondary btn-block" do %>
+            <i class="fas fa-user-cog"></i>
+          <% end %>
+        </div>
       </div>
 
+      <h2 class="mt-4">New post</h2>
+
+      <% if @post.errors.any? %>
+        <div class="alert alert-danger">
+          <ul class="mb-0">
+            <% @post.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <%= form_with model: @post, url: posts_path, local: true do |f| %>
+        <div class="form-group">
+          <%= f.label :title, "Title" %>
+          <%= f.text_field :title, class: "form-control" %>
+        </div>
+
+        <div class="form-group">
+          <%= f.label :body, "Comment" %>
+          <%= f.text_area :body, class: "form-control", rows: 3 %>
+        </div>
+
+        <!-- ★ Rate -->
+        <div class="form-group">
+          <%= f.label :rate, "Rate" %>
+          <div id="post_raty"></div>
+          <%= f.hidden_field :rate, id: "rate_field" %>
+        </div>
+        
+        <div class="mt-2">
+        <% @post.tags.each do |tag| %>
+        <%= link_to tag.name, tag_path(tag), class: "badge badge-light border mr-1" %>
+        <% end %>
+        </div>
+
+        <%= f.submit "Create Post", class: "btn btn-success btn-block" %>
+      <% end %>
+
+      <!-- 投稿用 raty -->
+      <script>
+      (() => {
+        const elem = document.querySelector("#post_raty");
+        if (!elem || elem.dataset.ratyInitialized) return;
+
+        raty(elem, {
+          starOn: "<%= asset_path('star-on.png') %>",
+          starOff: "<%= asset_path('star-off.png') %>",
+          starHalf: "<%= asset_path('star-half.png') %>",
+          scoreName: "post[rate]",
+          click: function(score) {
+            document.getElementById("rate_field").value = score;
+          }
+        });
+
+        elem.dataset.ratyInitialized = "true";
+      })();
+      </script>
+
+    </div>
+
+    <!-- 右：Posts -->
+    <div class="col-md-9">
+      <h2 class="mb-3">Posts</h2>
+
       <table class="table table-hover">
-        <thead class="thead-light">
+        <thead>
           <tr>
+            <th>User</th>
             <th>Title</th>
-            <th>Comment</th>
-            <th class="text-center">Likes</th>
+            <th>Likes</th>
+            <th>Comments</th>
+            <th>Rate</th>
             <th></th>
           </tr>
         </thead>
@@ -20,56 +108,80 @@
         <tbody>
           <% @posts.each do |post| %>
             <tr>
-              <!-- タイトル -->
               <td>
-                <%= link_to post.title,
-                            post_path(post),
-                            class: "text-dark font-weight-bold" %>
+                <% if post.user.present? %>
+                  <%= link_to(post.user.name.presence || post.user.email,
+                              user_path(post.user),
+                              class: "text-dark") %>
+                <% else %>
+                  <span class="text-muted">退会ユーザー</span>
+                <% end %>
               </td>
 
-              <!-- 本文 -->
-              <td>
-                <%= truncate(post.body, length: 50) %>
-              </td>
+              <td><%= link_to post.title, post_path(post) %></td>
 
-              <!-- いいね -->
-              <td class="text-center">
+              <!-- ❤️ Likes -->
+              <td>
                 <% if user_signed_in? %>
                   <% if post.favorited_by?(current_user) %>
                     <%= link_to post_favorite_path(post),
                                 method: :delete,
-                                class: "text-danger",
-                                data: { confirm: "いいねを外しますか？" } do %>
+                                class: "text-danger text-decoration-none" do %>
                       <i class="fas fa-heart"></i>
-                      <%= post.favorites.count %>
+                      <span class="ml-1"><%= post.favorites.count %></span>
                     <% end %>
                   <% else %>
                     <%= link_to post_favorite_path(post),
                                 method: :post,
-                                class: "text-secondary" do %>
+                                class: "text-secondary text-decoration-none" do %>
                       <i class="far fa-heart"></i>
-                      <%= post.favorites.count %>
+                      <span class="ml-1"><%= post.favorites.count %></span>
                     <% end %>
                   <% end %>
                 <% else %>
                   <i class="far fa-heart"></i>
-                  <%= post.favorites.count %>
+                  <span class="ml-1"><%= post.favorites.count %></span>
                 <% end %>
               </td>
 
-              <!-- 詳細 -->
-              <td class="text-right">
-                <%= link_to "Show",
-                            post_path(post),
-                            class: "btn btn-sm btn-outline-secondary" %>
+              <td><%= post.post_comments.count %></td>
+
+              <!-- ⭐ Rate -->
+              <td>
+                <div class="post-rate" data-score="<%= post.rate || 0 %>"></div>
+              </td>
+
+              <td>
+                <%= link_to "コメント欄へ", post_path(post), class: "btn btn-sm btn-outline-secondary" %>
               </td>
             </tr>
           <% end %>
         </tbody>
       </table>
 
+      <!-- 一覧用 raty -->
+      <script>
+      (() => {
+        document.querySelectorAll(".post-rate").forEach((elem) => {
+          if (elem.dataset.ratyInitialized) return;
+
+          raty(elem, {
+            starOn: "<%= asset_path('star-on.png') %>",
+            starOff: "<%= asset_path('star-off.png') %>",
+            starHalf: "<%= asset_path('star-half.png') %>",
+            readOnly: true,
+            score: elem.dataset.score
+          });
+
+          elem.dataset.ratyInitialized = "true";
+        });
+      })();
+      </script>
     </div>
+
   </div>
 </div>
+
+
 
 

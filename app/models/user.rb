@@ -1,5 +1,4 @@
 class User < ApplicationRecord
-  
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
 
@@ -9,12 +8,16 @@ class User < ApplicationRecord
   has_many :post_comments, dependent: :destroy
 
   def active_for_authentication?
-    super && (is_deleted == false)
+    super && !is_deleted
   end
 
   def inactive_message
     is_deleted ? :deleted_account : super
   end
 end
+
+
+
+
 
 

@@ -1,60 +1,125 @@
 <div class="container mt-4">
   <div class="row justify-content-center">
-    <div class="col-md-8">
+    <div class="col-md-9">
 
+      <!-- 投稿カード -->
       <div class="card shadow-sm">
         <div class="card-body">
 
-          <h3 class="card-title mb-3"><%= @post.title %></h3>
-
-          <p class="card-text mb-4"><%= @post.body %></p>
-
-          <div class="d-flex justify-content-between align-items-center">
-
-            <!-- ===== Like ===== -->
+          <div class="d-flex justify-content-between align-items-start">
             <div>
+              <h3 class="mb-1"><%= @post.title %></h3>
+              <div class="text-muted small">
+                by <%= @post.user.email %>
+                ・ <%= @post.created_at.strftime("%Y/%m/%d") %>
+              </div>
+            </div>
+
+            <!-- いいね -->
+            <div class="text-right">
               <% if user_signed_in? %>
                 <% if @post.favorited_by?(current_user) %>
                   <%= link_to post_favorite_path(@post),
                               method: :delete,
-                              class: "text-danger",
+                              class: "text-danger text-decoration-none",
                               data: { confirm: "いいねを外しますか？" } do %>
                     <i class="fas fa-heart"></i>
-                    <%= @post.favorites.count %>
+                    <span class="ml-1"><%= @post.favorites.count %></span>
                   <% end %>
                 <% else %>
                   <%= link_to post_favorite_path(@post),
                               method: :post,
-                              class: "text-secondary" do %>
+                              class: "text-secondary text-decoration-none" do %>
                     <i class="far fa-heart"></i>
-                    <%= @post.favorites.count %>
+                    <span class="ml-1"><%= @post.favorites.count %></span>
                   <% end %>
                 <% end %>
               <% else %>
-                <span class="text-muted">
-                  <i class="far fa-heart"></i>
-                  <%= @post.favorites.count %>
-                </span>
+                <i class="far fa-heart"></i>
+                <span class="ml-1"><%= @post.favorites.count %></span>
               <% end %>
             </div>
-
-            <!-- ===== Owner actions ===== -->
-            <% if user_signed_in? && current_user == @post.user %>
-              <div>
-                <%= link_to "編集", edit_post_path(@post),
-                            class: "btn btn-sm btn-outline-primary mr-2" %>
-
-                <%= link_to "削除", post_path(@post),
-                            method: :delete,
-                            data: { confirm: "本当に削除しますか？" },
-                            class: "btn btn-sm btn-outline-danger" %>
-              </div>
-            <% end %>
-
           </div>
+
+          <hr>
+
+          <p class="mb-0" style="white-space: pre-wrap;"><%= @post.body %></p>
+
+          <!-- 投稿者だけ：編集/削除 -->
+          <% if user_signed_in? && current_user == @post.user %>
+            <div class="mt-4 d-flex justify-content-end">
+              <%= link_to "編集", edit_post_path(@post),
+                          class: "btn btn-sm btn-outline-primary mr-2" %>
+
+              <%= link_to "削除", post_path(@post),
+                          method: :delete,
+                          data: { confirm: "本当に削除しますか？" },
+                          class: "btn btn-sm btn-outline-danger" %>
+            </div>
+          <% end %>
+
         </div>
       </div>
 
+      <!-- コメント -->
+      <div class="card mt-4">
+        <div class="card-body">
+          <h5 class="mb-3">
+            Comments (<%= @post.post_comments.count %>)
+          </h5>
+
+          <!-- コメント一覧 -->
+          <% @post.post_comments.order(created_at: :desc).each do |comment| %>
+            <div class="border-bottom py-2">
+              <div class="d-flex justify-content-between">
+                <div class="text-muted small">
+                  <%= comment.user.email %> ・ <%= comment.created_at.strftime("%Y/%m/%d %H:%M") %>
+                </div>
+
+                <% if user_signed_in? && comment.user == current_user %>
+                  <%= link_to "削除",
+                              post_post_comment_path(@post, comment),
+                              method: :delete,
+                              data: { confirm: "コメントを削除しますか？" },
+                              class: "btn btn-sm btn-outline-danger" %>
+                <% end %>
+              </div>
+              <div style="white-space: pre-wrap;"><%= comment.comment %></div>
+            </div>
+          <% end %>
+
+          <!-- コメント投稿フォーム -->
+          <% if user_signed_in? %>
+            <div class="mt-3">
+              <%= form_with model: [@post, @post_comment], local: true do |f| %>
+
+                <% if @post_comment.errors.any? %>
+                  <div class="alert alert-danger">
+                    <ul class="mb-0">
+                      <% @post_comment.errors.full_messages.each do |msg| %>
+                        <li><%= msg %></li>
+                      <% end %>
+                    </ul>
+                  </div>
+                <% end %>
+
+                <div class="form-group">
+                  <%= f.text_area :comment, rows: 3, class: "form-control", placeholder: "コメントを書く..." %>
+                </div>
+
+                <%= f.submit "送信", class: "btn btn-dark" %>
+              <% end %>
+            </div>
+          <% else %>
+            <div class="text-muted small mt-2">
+              コメントするにはログインが必要です。
+            </div>
+          <% end %>
+
+        </div>
+      </div>
+
+      <!-- 戻る -->
       <div class="mt-3">
         <%= link_to "一覧へ戻る", posts_path, class: "btn btn-link" %>
       </div>
@@ -62,4 +127,5 @@
     </div>
   </div>
 </div>
+
 

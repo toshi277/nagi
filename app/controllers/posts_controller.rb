@@ -29,7 +29,7 @@ class PostsController < ApplicationController
     tag_list = params[:tag_names].to_s.split(",").map { |t| t.strip }.reject(&:blank?)
 
     if @post.save
-      @post.tags = tag_list.map { |name| Tag.find_or_create_by!(name: name) }
+      #@post.tags = tag_list.map { |name| Tag.find_or_create_by!(name: name) }
       redirect_to post_path(@post), notice: "Post was successfully created."
     else
       render :new, status: :unprocessable_entity

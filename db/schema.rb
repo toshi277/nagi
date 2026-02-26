@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2026_01_22_134439) do
+ActiveRecord::Schema.define(version: 2026_02_25_121716) do
 
   create_table "admins", force: :cascade do |t|
     t.string "email", default: "", null: false
@@ -43,15 +43,6 @@ ActiveRecord::Schema.define(version: 2026_01_22_134439) do
     t.index ["user_id"], name: "index_post_comments_on_user_id"
   end
 
-  create_table "post_tags", force: :cascade do |t|
-    t.integer "post_id", null: false
-    t.integer "tag_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["post_id"], name: "index_post_tags_on_post_id"
-    t.index ["tag_id"], name: "index_post_tags_on_tag_id"
-  end
-
   create_table "posts", force: :cascade do |t|
     t.string "title"
     t.text "body"
@@ -61,11 +52,19 @@ ActiveRecord::Schema.define(version: 2026_01_22_134439) do
     t.integer "rate"
   end
 
+  create_table "taggings", force: :cascade do |t|
+    t.integer "post_id", null: false
+    t.integer "tag_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["post_id"], name: "index_taggings_on_post_id"
+    t.index ["tag_id"], name: "index_taggings_on_tag_id"
+  end
+
   create_table "tags", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["name"], name: "index_tags_on_name"
   end
 
   create_table "users", force: :cascade do |t|
@@ -87,6 +86,6 @@ ActiveRecord::Schema.define(version: 2026_01_22_134439) do
   add_foreign_key "favorites", "users"
   add_foreign_key "post_comments", "posts"
   add_foreign_key "post_comments", "users"
-  add_foreign_key "post_tags", "posts"
-  add_foreign_key "post_tags", "tags"
+  add_foreign_key "taggings", "posts"
+  add_foreign_key "taggings", "tags"
 end

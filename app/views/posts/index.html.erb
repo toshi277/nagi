@@ -30,7 +30,7 @@
 
       <h2 class="mt-4">New post</h2>
 
-      <% if @post.errors.any? %>
+      <% if @post&.errors&.any? %>
         <div class="alert alert-danger">
           <ul class="mb-0">
             <% @post.errors.full_messages.each do |message| %>
@@ -51,23 +51,16 @@
           <%= f.text_area :body, class: "form-control", rows: 3 %>
         </div>
 
-        <!-- ★ Rate -->
+        <!-- ★ Rate（投稿時のみ入力） -->
         <div class="form-group">
           <%= f.label :rate, "Rate" %>
           <div id="post_raty"></div>
-          <%= f.hidden_field :rate, id: "rate_field" %>
-        </div>
-        
-        <div class="mt-2">
-        <% @post.tags.each do |tag| %>
-        <%= link_to tag.name, tag_path(tag), class: "badge badge-light border mr-1" %>
-        <% end %>
         </div>
 
         <%= f.submit "Create Post", class: "btn btn-success btn-block" %>
       <% end %>
 
-      <!-- 投稿用 raty -->
+      <!-- 投稿用 raty（入力） -->
       <script>
       (() => {
         const elem = document.querySelector("#post_raty");
@@ -77,10 +70,7 @@
           starOn: "<%= asset_path('star-on.png') %>",
           starOff: "<%= asset_path('star-off.png') %>",
           starHalf: "<%= asset_path('star-half.png') %>",
-          scoreName: "post[rate]",
-          click: function(score) {
-            document.getElementById("rate_field").value = score;
-          }
+          scoreName: "post[rate]" // これでpost[rate]が送られる
         });
 
         elem.dataset.ratyInitialized = "true";
@@ -146,7 +136,7 @@
 
               <td><%= post.post_comments.count %></td>
 
-              <!-- ⭐ Rate -->
+              <!-- ⭐ Rate（表示） -->
               <td>
                 <div class="post-rate" data-score="<%= post.rate || 0 %>"></div>
               </td>
@@ -159,7 +149,7 @@
         </tbody>
       </table>
 
-      <!-- 一覧用 raty -->
+      <!-- 一覧用 raty（表示） -->
       <script>
       (() => {
         document.querySelectorAll(".post-rate").forEach((elem) => {
@@ -181,7 +171,3 @@
 
   </div>
 </div>
-
-
-
-

@@ -5,13 +5,13 @@ class PostsController < ApplicationController
 
   def index
     @post  = Post.new
-    @posts = Post.includes(:user).order(created_at: :desc)
+    @posts = Post.includes(:user, :tags).order(created_at: :desc)
   end
 
   def mine
     @user  = current_user
     @post  = Post.new
-    @posts = current_user.posts.order(created_at: :desc)
+    @posts = current_user.posts.includes(:tags).order(created_at: :desc)
   end
 
   def show
@@ -25,13 +25,12 @@ class PostsController < ApplicationController
 
   def create
     @post = current_user.posts.new(post_params)
-  
-    tag_list = params[:tag_names].to_s.split(",").map { |t| t.strip }.reject(&:blank?)
 
     if @post.save
-      #@post.tags = tag_list.map { |name| Tag.find_or_create_by!(name: name) }
+      save_tags(@post)
       redirect_to post_path(@post), notice: "Post was successfully created."
     else
+      @posts = Post.includes(:user, :tags).order(created_at: :desc)
       render :new, status: :unprocessable_entity
     end
   end
@@ -41,6 +40,7 @@ class PostsController < ApplicationController
 
   def update
     if @post.update(post_params)
+      save_tags(@post)
       redirect_to post_path(@post), notice: "Post was successfully updated."
     else
       render :edit, status: :unprocessable_entity
@@ -58,14 +58,17 @@ class PostsController < ApplicationController
     params.require(:post).permit(:title, :body, :rate)
   end
 
+  def save_tags(post)
+    tag_list = params.dig(:post, :tag_names).to_s.split(",").map(&:strip).reject(&:blank?)
+    post.tags = tag_list.map { |name| Tag.find_or_create_by(name: name) }
+  end
+
   def set_post
     @post = Post.find(params[:id])
   end
 
   def authorize_post!
-    unless @post.user == current_user
-      redirect_to posts_path, alert: "権限がありません"
-    end
+    redirect_to posts_path, alert: "権限がありません" unless @post.user == current_user
   end
 end
 

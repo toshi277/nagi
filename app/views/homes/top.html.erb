@@ -1,7 +1,9 @@
 <div class="top-hero">
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-12 col-sm-10 col-lg-7 text-center">
+  <div class="top-hero__overlay"></div>
+
+  <div class="container-fluid px-0">
+    <div class="row justify-content-center mx-0">
+      <div class="col-12 col-sm-10 col-lg-7 text-center top-hero__card">
 
         <p class="top-badge mb-3">Quiet sauna community</p>
 
@@ -15,10 +17,11 @@
           体験を共有する場所、それが <span class="brand">凪</span> です。
         </p>
 
-        <div class="top-actions">
-          <%= link_to "Log in", new_user_session_path, class: "btn btn-nagi-primary" %>
-          <%= link_to "Sign up", new_user_registration_path, class: "btn btn-nagi-ghost" %>
+        <div class="top-actions mb-4">
+          <%= link_to "Sign up", new_user_registration_path, class: "btn btn-nagi-primary" %>
+          <%= link_to "Log in", new_user_session_path, class: "btn btn-nagi-ghost" %>
         </div>
+
 
       </div>
     </div>

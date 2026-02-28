@@ -4,6 +4,17 @@ class UsersController < ApplicationController
   def show
     @post  = Post.new
     @posts = current_user.posts
+
+    case params[:sort]
+    when "new"
+      @posts = @posts.order(created_at: :desc)
+    when "old"
+      @posts = @posts.order(created_at: :asc)
+    when "rate"
+      @posts = @posts.order(rate: :desc, created_at: :desc)
+    else
+      @posts = @posts.order(created_at: :desc)
+    end
   end
 
   def edit
@@ -24,14 +35,13 @@ class UsersController < ApplicationController
     user.destroy
     redirect_to root_path, notice: "退会しました"
   end
-  
+
   private
 
   def index
     @users = User.all
   end
-  
-  
+
   def user_params
     params.require(:user).permit(:name, :email, :introduction)
   end

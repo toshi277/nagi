@@ -4,8 +4,19 @@ class PostsController < ApplicationController
   before_action :authorize_post!, only: [:edit, :update, :destroy]
 
   def index
-    @post  = Post.new
-    @posts = Post.includes(:user, :tags).order(created_at: :desc)
+    @post = Post.new  
+    @posts = Post.includes(:user, :favorites, :post_comments)
+  
+    case params[:sort]
+    when "new"
+      @posts = @posts.order(created_at: :desc)
+    when "old"
+      @posts = @posts.order(created_at: :asc)
+    when "rate"
+      @posts = @posts.order(rate: :desc, created_at: :desc) 
+    else
+      @posts = @posts.order(created_at: :desc)
+    end
   end
 
   def mine

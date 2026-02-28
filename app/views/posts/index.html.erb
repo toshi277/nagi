@@ -11,7 +11,7 @@
         <tbody>
           <tr>
             <th>name</th>
-            <td><%= current_user.name %></td>
+            <td><%= current_user.name.presence || current_user.email %></td>
           </tr>
           <tr>
             <th>introduction</th>
@@ -20,6 +20,7 @@
         </tbody>
       </table>
 
+  
       <div class="row mb-3">
         <div class="col-md-12 text-center">
           <%= link_to edit_user_path(current_user), class: "btn btn-outline-secondary btn-block" do %>
@@ -30,6 +31,7 @@
 
       <h2 class="mt-4">New post</h2>
 
+      
       <% if @post&.errors&.any? %>
         <div class="alert alert-danger">
           <ul class="mb-0">
@@ -55,12 +57,13 @@
         <div class="form-group">
           <%= f.label :rate, "Rate" %>
           <div id="post_raty"></div>
+        
         </div>
 
         <%= f.submit "Create Post", class: "btn btn-success btn-block" %>
       <% end %>
 
-      <!-- 投稿用 raty（入力） -->
+     
       <script>
       (() => {
         const elem = document.querySelector("#post_raty");
@@ -70,7 +73,7 @@
           starOn: "<%= asset_path('star-on.png') %>",
           starOff: "<%= asset_path('star-off.png') %>",
           starHalf: "<%= asset_path('star-half.png') %>",
-          scoreName: "post[rate]" // これでpost[rate]が送られる
+          scoreName: "post[rate]"
         });
 
         elem.dataset.ratyInitialized = "true";
@@ -98,11 +101,11 @@
         <tbody>
           <% @posts.each do |post| %>
             <tr>
+
+             
               <td>
                 <% if post.user.present? %>
-                  <%= link_to(post.user.name.presence || post.user.email,
-                              user_path(post.user),
-                              class: "text-dark") %>
+                  <%= post.user.name.presence || post.user.email %>
                 <% else %>
                   <span class="text-muted">退会ユーザー</span>
                 <% end %>
@@ -136,7 +139,7 @@
 
               <td><%= post.post_comments.count %></td>
 
-              <!-- ⭐ Rate（表示） -->
+              
               <td>
                 <div class="post-rate" data-score="<%= post.rate || 0 %>"></div>
               </td>
@@ -144,12 +147,12 @@
               <td>
                 <%= link_to "コメント欄へ", post_path(post), class: "btn btn-sm btn-outline-secondary" %>
               </td>
+
             </tr>
           <% end %>
         </tbody>
       </table>
 
-      <!-- 一覧用 raty（表示） -->
       <script>
       (() => {
         document.querySelectorAll(".post-rate").forEach((elem) => {
@@ -167,6 +170,7 @@
         });
       })();
       </script>
+
     </div>
 
   </div>

@@ -6,8 +6,9 @@ class SearchesController < ApplicationController
     @range  = params[:range]
     @search = params[:search]
 
-    if @range == "user"
+    if @range == "user" 
       @users = User.where(search_condition("name"))
+      
     else
       @posts = Post.where(search_condition("title"))
     end

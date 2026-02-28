@@ -17,39 +17,42 @@
         <% end %>
 
         <div class="form-group">
-          <p>Name</p>
+          <%= f.label :name, "Name" %>
           <%= f.text_field :name, class: "form-control" %>
         </div>
 
         <div class="form-group">
-        <p>Email</p>
-        <%= f.email_field :email, class: "form-control" %>
-        </div>
-        
-        <div class="form-group">
-        <p>Image</p>
-        <%= f.file_field :profile_image, accept: "image/*", class: "form-control-file" %>
+          <%= f.label :email, "Email" %>
+          <%= f.email_field :email, class: "form-control" %>
         </div>
 
         <div class="form-group">
-          <p>Introduction</p>
-          <%= f.text_area :introduction, class: "form-control" %>
+          <%= f.label :profile_image, "Image" %>
+          <%= f.file_field :profile_image, accept: "image/*", class: "form-control-file" %>
+        </div>
+
+        <div class="form-group">
+          <%= f.label :introduction, "Introduction" %>
+          <%= f.text_area :introduction, class: "form-control", rows: 4 %>
         </div>
 
         <div class="mt-2">
-          <%= f.submit "Update User", class: "btn btn-secondary" %>
+          <%= f.submit "Update User", class: "btn btn-secondary btn-block" %>
         </div>
 
       <% end %>
 
-       <hr>
+      <hr>
 
-       <div class="mt-4">
-       <%= button_to "退会する",
-        user_registration_path,
-        method: :delete,
-        data: { confirm: "本当に退会しますか？" },
-        class: "btn btn-danger" %>
-        </div>
+      <div class="mt-4">
+        <%= button_to "退会する",
+                      user_path,
+                      method: :delete,
+                      data: { confirm: "本当に退会しますか？" },
+                      class: "btn btn-danger btn-block" %>
+      </div>
 
+    </div>
+  </div>
+</div>
 

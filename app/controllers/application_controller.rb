@@ -4,8 +4,11 @@ class ApplicationController < ActionController::Base
   protected
 
   def configure_permitted_parameters
-    devise_parameter_sanitizer.permit(:sign_up, keys: [:name])
-    devise_parameter_sanitizer.permit(:account_update, keys: [:name])
+    # user のみ name を許可（admin には許可しない）
+    if resource_class == User
+      devise_parameter_sanitizer.permit(:sign_up, keys: [:name])
+      devise_parameter_sanitizer.permit(:account_update, keys: [:name])
+    end
   end
 
   def after_sign_in_path_for(resource)
@@ -19,7 +22,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def after_sign_out_path_for(resource_or_scope)
+  def after_sign_out_path_for(_resource_or_scope)
     root_path
   end
 end
